@@ -1,0 +1,242 @@
+---
+title: "R Notebook to find M_tuberculosis genes homologs in E_coli"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Clear environment 
+```{r}
+rm(list = ls())
+```
+
+# Libraries
+```{r}
+library(tidyr)
+library(stringr)
+library(dplyr)
+library(R.utils)
+library(DT)
+```
+
+# Workflow
+```{r}
+# 1) A list of genes of interest in Mtuberculosis (Mycobacterium tuberculosis)
+# 2) Extract the protein ids of these genes of interest in GFF file of Mtuberculosis
+# 3) Identify the homologous protein ids in Ecoli corresponding to the protein ids of Mtuberculosis
+# 4) Find the gene names of these protein ids in Ecoli
+# 5) This provdies homologous genes in Ecoli for genes of interest in Mtuberculosis
+```
+
+# 1 Import the file of genes of interest
+```{r}
+# set the directory
+Dir = getwd()
+root = dirname(dirname(dirname(Dir)))
+data_dir = paste0(root, "/Data/BLAST/")
+result_dir = paste0(root, "/Results/Homology_results/")
+gene_file_name = "Mtb_genes_of interest_names.txt"
+file = paste0(data_dir,gene_file_name)
+
+gene_file = read.table(file)
+# transpose
+gene_file = t(gene_file)
+#head(gene_file)
+
+#convert as dataframe
+gene_file = as.data.frame(gene_file)
+#head(gene_file)
+
+#add a col name
+colnames(gene_file) = "Mtb_gene_name_154"
+#dim(gene_file)
+
+#separate gene name and gene Rv to match gene ids properly and the merge them later
+gene_name_file = gene_file %>%
+  filter(!str_detect(Mtb_gene_name_154, "^Rv"))
+gene_name_file %>% datatable()
+# gene with Rv numbers
+gene_rv_number_file = gene_file %>%
+  filter(str_detect(Mtb_gene_name_154, "^Rv"))
+gene_rv_number_file %>% datatable()
+```
+
+# 2.1 Download protein fasta and GFF files for M tuberculosis
+```{r}
+
+# links for genomic gff and protein faa files
+Mtb_gff_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2/GCF_000195955.2_ASM19595v2_genomic.gff.gz"
+Mtb_faa_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/195/955/GCF_000195955.2_ASM19595v2/GCF_000195955.2_ASM19595v2_protein.faa.gz"
+
+# download Mtuberculosis GFF file
+if (file.exists(paste0(data_dir,"Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_genomic.gff"))) {
+  print("The file exists")
+} else {
+download.file(url = Mtb_gff_url,
+              destfile = paste0(data_dir,"Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_genomic.gff.gz"))
+gunzip(filename = paste0(data_dir,"Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_genomic.gff.gz"))
+}
+
+# download Mtuberculosis faa file
+if (file.exists(paste0(data_dir,"Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_protein.faa"))) {
+  print("The file exists")
+} else {
+download.file(url = Mtb_faa_url,
+              destfile = paste0(data_dir,"Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_protein.faa.gz"))
+gunzip(filename = paste0(data_dir,"Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_protein.faa.gz"))
+}
+```
+
+# 2.2 Import Mtb gff file to match gene names to protein ids
+```{r}
+Mtb_gff_file_name = "Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_genomic.gff"
+Mtb_gff_file = paste0(data_dir, Mtb_gff_file_name)
+Mtb_gff = read.csv(Mtb_gff_file, header = FALSE, sep = "\t", comment.char = "#")
+
+Mtb_gff = Mtb_gff %>%
+  filter(V3 == "CDS") %>%
+  select(V1, V3, V9)
+head(Mtb_gff) %>% datatable()
+```
+
+# 2.3 Extract gene ids, gene name and Rv_number ids
+```{r}
+#extract the ID part
+Mtb_gff = Mtb_gff %>% mutate(ID_cds_Mtb = str_extract(Mtb_gff$V9, '(?<=ID=cds-)[A-Z]+_\\d{4,9}.\\d{1}(?=;)')) %>% 
+  mutate(gene = str_extract(V9, '(?<=gene=)[A-Z,a-z,0-9]+(?=;)')) %>% 
+  # some of the protein ids do not have gene names so instead use Rv numbers
+  mutate(Rv_number = str_extract(V9, '(?<=Parent=gene-)[A-Z,a-z,0-9]+(?=;)')) %>% 
+  select(ID_cds_Mtb, gene, Rv_number)
+#head(Mtb_gff)
+
+#replace the missing gene names with value in Rv_number column
+Mtb_gff$gene = ifelse(is.na(Mtb_gff$gene),Mtb_gff$Rv_number, Mtb_gff$gene)
+head(Mtb_gff)
+# dim(Mtb_gff)
+#sum(is.na(Mtb_gff$ID_cds_Mtb))
+
+```
+
+# 2.4 Extract Mtb protein ids  for the genes of interest
+```{r}
+Mtb_gff_gene = Mtb_gff %>% select(ID_cds_Mtb,  gene)
+head(Mtb_gff_gene)
+
+#join  gene_name_file and Mtb_gff to select only the genes of interest
+gene_of_int_name_to_Mtb_id = left_join(gene_name_file, Mtb_gff_gene, by = c("Mtb_gene_name_154" = "gene"), copy = T )
+
+Mtb_gff_rv_number = Mtb_gff %>% select(ID_cds_Mtb,  Rv_number)
+
+#join rv number part to 
+gene_of_int_rv_number_to_Mtb_id = left_join(gene_rv_number_file, Mtb_gff_rv_number, by = c("Mtb_gene_name_154" = "Rv_number"), copy = T )
+
+#merge both the parts
+gene_of_int_to_Mtb_id = rbind(gene_of_int_name_to_Mtb_id,gene_of_int_rv_number_to_Mtb_id)
+gene_of_int_to_Mtb_id %>% datatable()
+
+```
+
+# 3 To find homologs of these protein ids in Ecoli
+
+# 3.1 Download protein fasta and GFF files for E coli
+```{r}
+# links for genomic gff and protein faa files
+Ecoli_gff_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.gff.gz"
+Ecoli_faa_url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_protein.faa.gz"
+
+# download Ecoli GFF file
+if (file.exists(paste0(data_dir,"Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_genomic.gff"))) {
+  print("The file exists")
+} else {
+download.file(url = Ecoli_gff_url,
+              destfile = paste0(data_dir,"Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_genomic.gff.gz"))
+gunzip(filename = paste0(data_dir,"Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_genomic.gff.gz"))
+}
+
+# download Ecoli faa file
+if (file.exists(paste0(data_dir,"Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa"))) {
+  print("The file exists")
+} else {
+download.file(url = Ecoli_faa_url,
+              destfile = paste0(data_dir,"Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa.gz"))
+gunzip(filename = paste0(data_dir,"Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa.gz"))
+}
+```
+
+# 3.2 Running blast commands in R
+```{r}
+# make blast database for Ecoli protein fasta
+# BLAST 2.5.0+
+system(command = "makeblastdb -in Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa -dbtype prot", ignore.stdout = T)
+system(command = "blastp -outfmt 7 -max_target_seqs 1 -evalue 0.01 -db Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa -query Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_protein.faa > Ecoli_vs_Mtuberculosis_outfmt7.tsv", ignore.stdout = T)
+```
+
+# 3.3 Import blastp output
+```{r}
+file_name = "Ecoli_vs_Mtuberculosis_outfmt7.tsv"
+file  = paste0(result_dir,file_name)
+
+Ecoli_Mtb_outfmt7 = read.table(file, header = F)
+#head(Ecoli_Mtb_outfmt7)
+
+#select first two col which have protein ids for homologs
+Ecoli_Mtb_outfmt7 = Ecoli_Mtb_outfmt7 %>% select(V1,V2)
+#head(Ecoli_Mtb_outfmt7)
+
+#rename col names because there is no header
+colnames(Ecoli_Mtb_outfmt7) = c("Mtb_pro_id", "Ecoli_pro_id")
+Ecoli_Mtb_outfmt7 %>%  datatable()
+
+```
+
+# 4.1 Extract Ecoli genes ids corresponding to Mtb ids of genes of interest
+```{r}
+#left merge gene_of_int_to_Mtb_id and Ecoli_Mtb_outfmt7
+Mtb_to_Ecoli_154 = left_join(gene_of_int_to_Mtb_id, Ecoli_Mtb_outfmt7, by = c("ID_cds_Mtb"= "Mtb_pro_id"))
+Mtb_to_Ecoli_154 %>%  datatable()
+#some entries were duplicated so remove duplicate entries
+Mtb_to_Ecoli_154 = distinct(Mtb_to_Ecoli_154)
+Mtb_to_Ecoli_154 %>%  datatable()
+
+```
+
+# 4.2 Ecoli gene id gene names and rv numbers
+```{r}
+Ecoli_gff_file_name = "Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_genomic.gff"
+Ecoli_gff_file = paste0(data_dir, Ecoli_gff_file_name)
+Ecoli_gff = read.csv(Ecoli_gff_file, header = FALSE, sep = "\t", comment.char = "#")
+
+head(Ecoli_gff) %>%  datatable()
+
+Ecoli_gff_2 = Ecoli_gff %>% 
+  filter(V3 == "CDS") %>%
+  #extract the ID part
+  mutate(ID_cds_Ecoli = str_extract(V9, '(?<=ID=cds-)[A-Z]+_\\d{4,9}.\\d{1}(?=;)')) %>% 
+  #extract the gene part
+  mutate(gene_Ecoli = str_extract(V9, '(?<=gene=)[A-Z,a-z,0-9]+(?=;)')) %>% 
+  #extract the Rv part because some gene names are missing and Rv names are given instead
+  mutate(Rv_number_Ecoli = str_extract(V9, '(?<=Parent=gene-)[A-Z,a-z,0-9]+(?=;)')) %>%
+  select(ID_cds_Ecoli, gene_Ecoli, Rv_number_Ecoli)
+#sum(is.na(Ecoli_gff_2$ID_cds_Ecoli))
+
+Ecoli_gff_2 %>% datatable()
+
+```
+
+# 5 Merge Mtb_to_Ecoli_154 to Ecoli_gff_2
+```{r}
+# to select the homologous genes in Ecoli
+Mtb_to_Ecoli_154_Ecoli_gff = left_join(Mtb_to_Ecoli_154, Ecoli_gff_2, by = c("Ecoli_pro_id" ="ID_cds_Ecoli"), na_matches = "never")
+Mtb_to_Ecoli_154_Ecoli_gff %>% datatable()
+
+#save output
+output_file_name = "Mtb_to_Ecoli_154_Ecoli_gff.txt"
+output_file = paste0(result_dir,output_file_name)
+write.table(Mtb_to_Ecoli_154_Ecoli_gff, output_file, row.names =  F, quote = F, sep = "\t")
+```
+# Session information
+```{r}
+sessionInfo()
+```
+
+
