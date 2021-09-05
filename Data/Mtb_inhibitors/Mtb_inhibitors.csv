@@ -1,0 +1,45 @@
+Name,SMILES
+IDR-0106878,O=C(Nc2nc(c1ccccn1)cs2)c3ccccc3
+2471-80,CNCCCC(CNC(CN)Cc2ccc1ccccc1c2)NCCCc3cccc4ccccc34
+actinonin,CCCCCC(CC(=O)NO)C(=O)NC(C(C)C)C(=O)N1CCCC1CO
+amsacrine,COC1=C(C=CC(=C1)NS(=O)(=O)C)NC2=C3C=CC=CC3=NC4=CC=CC=C42
+amycobactin,COC4C1CC(C)CC2(O1)OC(C(C)C(=O)C2C)C(C)C(O)CC(=O)OC(C(C)CC(C)C(=O)c3cc(O)c(C)c(O)c3)CCCCC(C)C4OC(C)=O
+AN2679,OB1OCc2ccccc12
+azaserine,C(C(C(=O)O)N)OC(=O)C=[N+]=[N-]
+BB-3497,CCCCC(CN(O)C=O)C(=O)NC(C(=O)N(C)C)C(C)(C)C
+Butein,C1=CC(=C(C=C1C=CC(=O)C2=C(C=C(C=C2)O)O)O)O
+CCA34,Nc5cccc(C4CC(=O)Oc3ccc(c2ccc(CN1CCOCC1)cc2)cc34)c5
+Compound 1_gurcha,NC(=O)C3CCN(c2nc(=O)c(=Cc1ccc(Cl)cc1Cl)s2)CC3
+Compound 1_buchieri,CC(=O)OC2OC(CC(=O)/C=C/c1cccc(O)c1)C(OC(C)=O)C(OC(C)=O)C2OC(C)=O
+Compound 1_murugesan,O=C(CSc2nc1ccccc1c(=O)[nH]2)NC3CCCCC3
+Compound 14_jeankumar,CCOC(=O)c2sc(c1ccccc1)nc2N4CCC(NCc3ccc(F)c(C)c3C)CC4
+Compound 14_krishna,Cc3ccc(C(=O)C1C=NC(=S)NC1c2ccc(F)cc2)cc3
+Compound 14_palencia,CCOc1ccc(Br)c2c1B(O)OC2CN
+Compound 15,CCCCCCCCNCc3ccc(CNC(=O)c1csc2nc[nH]c(=O)c12)cc3
+Compound 16,COc3ccc(NC(=O)Nc2nnc(c1ccc([N+](=O)O)s1)s2)cc3
+Compound 18b,CCOP(=O)(CCCN(O)C(=O)CCCc1ccccc1)OCC
+Compound 29e,CC(C)N1CCNCC1Cc5ccc(CN4CCc3ccc(c2[nH]nc(N)c2C#N)cc34)cc5
+Compound 4c,CCOC(=O)C(NC(=O)C(=O)c1ccc([N+](=O)O)cc1)C(C)C
+Compound 7,COc2ccc(S(=O)(=O)N1CCCCCC1)cc2NC(=O)Cc3n[nH]c(=O)c4ccccc34
+D155931,O=C(O)c4cccc(n3c(=O)sc(=Cc2ccc(c1ccccc1Cl)o2)c3=O)c4
+DC-159a,COc4c(N2CC(C)(N)C1(CC1)C2)c(F)cc5c(=O)c(C(=O)O)cn(C3CC3F)c45
+Fc14-584B,S=C(S)NCCN1CCCCC1
+GSK3011724A,CCCCS(=O)(=O)Nc2ccc1cnn(C)c1c2
+GSK85A,N#Cc5ccc(COc4ccc3CN(C(=O)/C=C/c2ccc(Cc1ccc(F)cn1)cc2)CCc3c4)cc5
+GSK92A,Nc3ccc(/C=C/C(=O)N2CCC(COc1cccnc1)CC2)cn3
+GSK93A,O=C(O)c3ccc(Nc2nc(c1cccs1)cs2)cc3O
+GSK97C,O=C4OC3(CCC(CNc2ccc(c1cc(F)cc(F)c1)nn2)CC3)CN4c5cccnn5
+IMT007,c2nc(N1CCNCC1)cc3CCS[n+]23
+LBK-611,CCCCC(CN(O)C=O)C(=O)N1CCCC1C(=O)Nc2ccccn2
+MB16695,N=C(NNC(=O)c1ccco1)c2ccccn2
+Octoclothepin,CN4CCN(C3Cc1ccccc1Sc2ccc(Cl)cc23)CC4
+SC-5217501,CC(C)C1CCC(C)CC1OC(=O)CN3c2ccccc2N(C)C3c4ccc(F)cc4
+SC-6655281,O=C(CSc1ccc(Cl)cc1)Nc2ccc(Cl)c(C(F)(F)F)c2
+SC-7759844,COc2ccc(OC(C)C(=O)Nc1ccc(I)cc1)cc2
+secneolitsine,CNCCC1=CC2=C(C3=C1C=CC4=CC5=C(C=C43)OCO5)OCO2
+thiolactomycin,CC1=C(C(SC1=O)(C)C=C(C)C=C)O
+THT-1,CC(C)(C)c1ccccc1OCCCON2C(=N)NC(N)NC2(C)C
+"TPSA, 2-[5-(2-{[4-(2-thienyl)-2-pyrimidinyl]sulfanyl}acetyl)-2-thienyl]acetic acid",O=C(O)Cc3ccc(C(=O)CSc2nccc(c1ccsc1)n2)s3
+VCC234718,O=C(C1CCCCC1)N4CCN(S(=O)(=O)c2cccc3cnccc23)CC4
+VXc-486,CCNC(=O)Nc4nc3cc(c1cnc(C(C)(C)O)nc1)c(F)c(C2CCCO2)c3[nH]4
+Z0933,CC(C)(C)OC(=O)Nc5ccc(c3nc1ccccc1c4[nH]c2ccccc2c34)cc5
