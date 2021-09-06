@@ -167,8 +167,21 @@ gunzip(filename = paste0(data_dir,"Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_pro
 ```{r}
 # make blast database for Ecoli protein fasta
 # BLAST 2.5.0+
-system(command = "makeblastdb -in Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa -dbtype prot", ignore.stdout = T)
-system(command = "blastp -outfmt 7 -max_target_seqs 1 -evalue 0.01 -db Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa -query Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_protein.faa > Ecoli_vs_Mtuberculosis_outfmt7.tsv", ignore.stdout = T)
+# Make sure that the folder containing blast program in the path
+#try
+#Sys.getenv("PATH")
+# if the blast folder in not in this path run
+# old_path <- Sys.getenv("PATH")
+# Sys.setenv(PATH = paste(old_path, "path/to/blast_folder", sep = ":"))
+Ecoli_faa = paste0(data_dir,'Ecoli_K12_MG1655_GCF_000005845_2_ASM584v2_protein.faa')
+Mtb_faa = paste0(data_dir,"Mtuberculosis_H37RvGCF_000195955_2_ASM19595v2_protein.faa")
+output_file = paste0(result_dir,"Ecoli_vs_Mtuberculosis_outfmt7.tsv")
+system2(command = "makeblastdb",
+       args = c("-in", Ecoli_faa, "-dbtype prot"),
+       stdout = F)
+system2(command = "blastp",
+        args = c("-outfmt 7 -max_target_seqs 1 -evalue 0.01 -db", Ecoli_faa, "-query", Mtb_faa),
+        stdout = output_file)
 ```
 
 # 3.3 Import blastp output
