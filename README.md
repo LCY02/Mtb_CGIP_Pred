@@ -1,10 +1,16 @@
-# Deep learning - driven prediction of drug mechanism of action from large-scale chemical-genetic interaction profiles
+# Deep learning-driven prediction of drug mechanism of action from large-scale chemical-genetic interaction profiles
+
+## Introduction
+
+This repository provides codes and materials to accompany the paper ["Deep learning-driven prediction of drug mechanism of action from large-scale chemical-genetic interaction profiles"](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-022-00596-6)
 
 ![](https://github.com/LCY02/Mtb_CGIP_Pred/blob/main/Image/framework.png?raw=true)
+
 > Framework
 
 ## File structure
-``` bash
+
+```bash
 ├── Codes/
 │   ├── Gene_clustering/
 │           ├── Hierarchical_clustering/
@@ -72,4 +78,5 @@
 ```
 
 ## Summary
+
 This repository contains scripts, datasets and partial results that support the findings of our study. The Johnson et al. data investigated in this study is publicly accessible on the [web site](https://www.chemicalgenomicsoftb.com/). The code to train the Message Passing Neural Networks is available on [Chemprop](https://github.com/chemprop).
